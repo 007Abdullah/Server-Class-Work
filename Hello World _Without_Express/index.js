@@ -1,5 +1,5 @@
 var express = require("express");
-
+var cores = require('cors');
 var app = express();
 
 app.use(function middlerwale(req, respon, next) {

@@ -20,6 +20,9 @@
             const url = 'http://192.168.50.177:3000';
             Http.open("POST", url);
             Http.send();
+            Http.onreadystatechange = (e) => {
+                console.log(Http.responseText)
+            }
         }
 
         function put() {
@@ -27,6 +30,9 @@
             const url = 'http://192.168.50.177:3000';
             Http.open("PUT", url);
             Http.send();
+            Http.onreadystatechange = (e) => {
+                console.log(Http.responseText)
+            }
         }
 
         function delet() {
@@ -34,6 +40,9 @@
             const url = 'http://192.168.50.177:3000/bulb';
             Http.open("Delete", url);
             Http.send();
+            Http.onreadystatechange = (e) => {
+                console.log(Http.responseText)
+            }
         }
 
 
