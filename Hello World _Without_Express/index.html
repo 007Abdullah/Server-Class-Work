@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index.html</title>
+    <script>
+        function get() {
+            const Http = new XMLHttpRequest();
+            const url = 'http://192.168.50.177:3000/bulb';
+            Http.open("GET", url);
+            Http.send();
+            Http.onreadystatechange = (e) => {
+                console.log(Http.responseText)
+            }
+        }
+        function post() {
+            const Http = new XMLHttpRequest();
+            const url = 'http://192.168.50.177:3000';
+            Http.open("POST", url);
+            Http.send();
+        }
+
+        function put() {
+            const Http = new XMLHttpRequest();
+            const url = 'http://192.168.50.177:3000';
+            Http.open("PUT", url);
+            Http.send();
+        }
+
+        function delet() {
+            const Http = new XMLHttpRequest();
+            const url = 'http://192.168.50.177:3000/bulb';
+            Http.open("Delete", url);
+            Http.send();
+        }
+
+
+
+    </script>
+
+
+</head>
+
+<body>
+    <button onclick="get()">Get</button>
+    <br>
+    <button onclick="post()">Post</button>
+    <br>
+    <button onclick="put()">Put</button>
+    <br>
+    <button onclick="delet()">Delete</button>
+</body>
+
+</html>
