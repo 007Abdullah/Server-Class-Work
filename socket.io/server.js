@@ -1,7 +1,11 @@
 var users = [
-    {
-        name: "sameer"
-    },
+    { userName: "ali" },
+    { userName: "li" },
+    { userName: "ai" },
+    { userName: "ai" },
+    { userName: "ali" },
+    { userName: "ai" },
+    { userName: "aliadasd" },
 ];
 
 
@@ -27,51 +31,62 @@ app.get("/signup", (req, res, next) => {
 
 
 
-
-
-
-
 app.use("/", express.static(path.resolve(path.join(__dirname, 'public'))))
 
 app.post('/gtdata', (req, res, next) => {
-    let sass = req.body.user;
+    // let sass = req.body.name;
+    users.push({
+        userName: req.body.name
+    });
     res.send({
-        check: sass
+        check: users,
+        message: "send"
     });
     console.log(sass);
 })
-// var server = http.createServer(app);
+var server = http.createServer(app);
 
 
-// var io = socketIO(server);
+var io = socketIO(server);
 
 
 
 
-// io.on('connection', (user) => {
+io.on('connection', (user) => {
 
-//     console.log("user id: ", user.id);
+    console.log("user", user);
 
-//     user.emit("NOTIFICATION", "some data")
-
-//     users.push(user);
-
-//     console.log("user count: ", users.length);
+    console.log("user id: ", user.id);
 
 
-//     setTimeout(function () {
-//         users[0].emit("NOTIFICATION", "new message")
-//     }, 10000)
-//     console.log('a user connected');
+    {
+        users.map((eachUser) => {
+            console.log("Each user", eachUser.userName)
+        })
+    }
 
-// });
+    console.log("Name ", users[0].userName)
+
+    user.emit("Name ", users[0].userName)
+
+    users.push(user)
+    setTimeout(function () {
+        {users.map((eachUser) => {
+                console.log("Each user", eachUser.userName)
+            })
+        }
+
+    }, 1000)
+    console.log('a user connected');
+
+});
 
 
-// setInterval(function () {
-//     io.emit("COMMON_TOPIC", `some comon data: ${new Date().getSeconds()}`)
-// }, 3000)
+setInterval(function () {
+    io.emit("COMMON_TOPIC", `some comon data: ${new Date().getSeconds()}`)
+}, 3000)
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log("server is running on: ", PORT);
 })
