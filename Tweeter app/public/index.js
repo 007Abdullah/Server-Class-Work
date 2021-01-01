@@ -14,6 +14,7 @@ socket.on('connect', function () {
     console.log("user is connect")
 })
 function signup() {
+
     let signupData = {
         name: document.getElementById('txt_name').value,
         fname: document.getElementById('txt_fname').value,
@@ -81,17 +82,17 @@ function login() {
     return false;
 }
 
-let logout = () => {
-    if (currentUser === null || currentUser === undefined) {
-        window.location.href = "index.html";
-    }
-    else {
-        currentUser = null;
-        localStorage.removeItem("currentUser");
-        window.location.href = "login.html";
-    }
+// let logout = () => {
+//     if (currentUser === null || currentUser === undefined) {
+//         window.location.href = "index.html";
+//     }
+//     else {
+//         currentUser = null;
+//         localStorage.removeItem("currentUser");
+//         window.location.href = "login.html";
+//     }
 
-}
+// }
 
 function post() {
 
@@ -113,3 +114,66 @@ function post() {
     }
 }
 
+function getTweets() {
+
+    if (localStorage.getItem("currentUser")) {
+        currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        document.getElementById("welcomeUser").innerHTML = `Welcome , ${currentUser.userName}`
+    }
+    if (!currentUser) {
+        document.getElementById("welcomeUser").innerHTML = "Signup and tweet your thoughts away";
+        document.getElementById("lgBtn").innerText = "Signup Now";
+        document.getElementById("userPost").style.display = "none";
+        document.getElementById("postBtn").style.display = "none"; 
+
+    }
+    const Http = new XMLHttpRequest();
+    Http.open("GET", url + "/tweet");
+    Http.setRequestHeader("Content-Type", "application/json");
+
+    Http.send();
+    Http.onreadystatechange = (e) => {
+        if (Http.readyState === 4) {
+            let tweets = JSON.parse((Http.responseText));
+            for (i = 0; i < tweets.length; i++) {
+                var eachtweet = document.createElement("li");
+                eachtweet.innerHTML = `<h4 class="userName">
+                ${tweets[i].userName}
+                </h4>
+                 <p class="userPost">
+                    ${tweets[i].tweetText}
+                </p>`;
+                document.getElementById("posts").appendChild(eachtweet);
+            }
+        }
+    }
+}
+
+socket.on("NEW_POST", (newPost) => {
+    let jsonRes = JSON.parse(newPost);
+
+    var eachtweet = document.createElement("li");
+    eachtweet.innerHTML = `<h4 class="userName">
+    ${jsonRes.userName}
+    </h4>
+     <p class="userPost">
+        ${jsonRes.tweetText}
+    </p>`;
+
+    document.getElementById("posts").appendChild(eachtweet);
+
+})
+
+function logout() {
+
+    if (currentUser === null || currentUser === undefined) {
+        window.location.href = "index.html";
+    }
+    else {
+        currentUser = null;
+        localStorage.removeItem("currentUser");
+        window.location.href = "login.html";
+    }
+
+
+}

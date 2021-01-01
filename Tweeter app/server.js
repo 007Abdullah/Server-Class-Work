@@ -7,6 +7,12 @@ let users = [
         userPost: [],
     },
 ];
+
+
+let tweets = [{
+    userName: "some name",
+    tweetText: "some text"
+}]
 const PORT = process.env.PORT || 5000;
 const express = require("express");
 const http = require("http");
@@ -22,6 +28,8 @@ var app = express();
 var server = http.createServer(app);
 
 var io = socketIO(server);
+
+
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -100,9 +108,16 @@ app.post("/login", (req, res, next) => {
 })
 
 app.post("/tweet", (req, res, next) => {
-
+    tweets.push({
+        userName: req.body.userName,
+        tweetText: req.body.tweetText,
+    })
+    res.send(tweets);
+    io.emit("NEW_POST", JSON.stringify(tweets[tweets.length - 1]));
 })
-
+app.get("/tweet", (req, res, next) => {
+    res.send(tweets);
+})
 server.listen(PORT, () => {
     console.log("Server is Runnig :", PORT);
 })
