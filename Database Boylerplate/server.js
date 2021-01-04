@@ -10,7 +10,7 @@ const path = require("path");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/testdb?retryWrites=true&w=majority";
-// let dbURI = 'mongodb://localhost:27017/abc-database';
+// let dbURI = 'mongodb://localhost:27017/testdb-database';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
@@ -36,7 +36,7 @@ process.on('SIGINT', function () {////this function will run jst before app is c
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
 
 var userSchema = new mongoose.Schema({
-    name: String,
+    uname: String,
     email: String,
     password: String,
     phone: String,
@@ -56,20 +56,20 @@ app.use("/", express.static(path.resolve(path.join(__dirname, "public"))));
 
 
 app.post("/signup", (req, res, next) => {
-    if (!req.body.name || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
+    if (!req.body.uname || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
         res.status(403).send(`  please send name, email, passwod, phone and gender in json body.
         e.g:
         {
-            "name": "malik",
-            "email": "malikasinger@gmail.com",
+            "uname": "Sameer",
+            "email": "kb337137@gmail.com",
             "password": "abc",
-            "phone": "03001234567",
+            "phone": "03121278181",
             "gender": "Male"
         }`);
         return;
     }
     var newUser = new userModel({
-        "name": req.body.name,
+        "uname": req.body.uname,
         "email": req.body.email,
         "password": req.body.password,
         "phone": req.body.phone,
@@ -77,18 +77,10 @@ app.post("/signup", (req, res, next) => {
     });
     newUser.save((err, data) => {
         if (!err) {
-            res.send({
-                message: "User is Created",
-                status: 200
-            });
-        }
-        else {
+            res.send("user created")
+        } else {
             console.log(err);
-            res.send({
-                message: "User Create Error",
-                err: `${err}`,
-                status: 500
-            });
+            res.status(500).send("user create error, " + err)
         }
     });
 });

@@ -1,4 +1,4 @@
-
+const url = "http://localhost:5000"
 function signup() {
     let user = {
         name: document.getElementById("txt_name").value,
@@ -7,7 +7,6 @@ function signup() {
         phone: document.getElementById("txt_number").value,
         gender: document.getElementById("gender").value
     }
-
     const Http = new XMLHttpRequest();
     Http.open("POST", url + "/signup");
     Http.setRequestHeader("Content-Type", "application/json");
