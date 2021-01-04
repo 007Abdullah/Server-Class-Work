@@ -17,7 +17,7 @@ function signup() {
 
             // console.log(Http.responseText)
             let jsonRes = JSON.parse(Http.responseText)
-
+            console.log(jsonRes);
             if (jsonRes.status === 200) {
                 alert(jsonRes.message);
             } else {

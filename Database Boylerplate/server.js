@@ -77,10 +77,13 @@ app.post("/signup", (req, res, next) => {
     });
     newUser.save((err, data) => {
         if (!err) {
-            res.send("user created")
-        } else {
-            console.log(err);
-            res.status(500).send("user create error, " + err)
+            res.send({
+                message: "user created",
+            });
+        }
+         else {
+        console.log(err);
+        res.status(500).send("user create error, " + err)
         }
     });
 });
