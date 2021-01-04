@@ -4,6 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const path = require("path");
 
 
 
@@ -76,15 +77,18 @@ app.post("/signup", (req, res, next) => {
     });
     newUser.save((err, data) => {
         if (!err) {
-            res.status(200).send({
-                message: "User is Created"
+            res.send({
+                message: "User is Created",
+                status: 200
             });
         }
         else {
             console.log(err);
-            res.status(500).send({
-                message: "User Create Error"
-            } + err);
+            res.send({
+                message: "User Create Error",
+                err: `${err}`,
+                status: 500
+            });
         }
     });
 });
