@@ -55,6 +55,7 @@ app.use(morgan('dev'));
 app.use("/", express.static(path.resolve(path.join(__dirname, "public"))));
 
 
+
 app.post("/signup", (req, res, next) => {
     if (!req.body.uname || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
         res.status(403).send(`  please send name, email, passwod, phone and gender in json body.
@@ -69,11 +70,11 @@ app.post("/signup", (req, res, next) => {
         return;
     }
     var newUser = new userModel({
-        "uname": req.body.uname,
-        "email": req.body.email,
-        "password": req.body.password,
-        "phone": req.body.phone,
-        "gender": req.body.gender,
+        uname: req.body.uname,
+        email: req.body.email,
+        password: req.body.password,
+        phone: req.body.phone,
+        gender: req.body.gender,
     });
     newUser.save((err, data) => {
         if (!err) {
@@ -91,39 +92,27 @@ app.post("/signup", (req, res, next) => {
     });
 });
 
-
-
-
 app.post('/login', (req, res) => {
-    if (!req.body.email || !req.body.password) {
-        res.status(403).send(`  please send name, email, passwod, phone and gender in json body.
-        e.g:
-        {
-           
-            "email": "kb337137@gmail.com",
-            "password": "****",
-          
-        }`);
-        return;
-    }
-    let email = req.body.email;
-    let password = req.body.password;
-    userModel.findOne({ email: email, password: password }, function (err, data) {
-        if (!err) {
-            res.send({
-                message: "Login",
-                status: 200
-            })
+
+    // userModel.findOne({email:req.body.email, password: req.body.password })
+    userModel.findOne({ email: req.body.email, password: req.body.password }, function (err, data) {
+        if (err) {
+            console.log(err)
+            res.status(500).send();
         }
-        else {
-            console.log(err);
-            return res.status(500).send({
-                message: "User Not Found" + err
-            })
+        if (!data) {
+            return res.status(404).send({
+                message: "user not found"
+            });
         }
+        return res.status(200).send({
+            message: "Login Successfully"
+        })
     })
 
 });
+
+
 
 
 // userModel.find(function (err, data) {
