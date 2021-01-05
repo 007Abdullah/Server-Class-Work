@@ -79,15 +79,73 @@ app.post("/signup", (req, res, next) => {
         if (!err) {
             res.send({
                 message: "user created",
-                status:200
+                status: 200
             });
         }
         else {
             console.log(err);
-            res.status(500).send("user create error, " + err)
+            res.status(500).send({
+                message: "user create error, " + err
+            });
         }
     });
 });
+
+
+
+
+app.post('/login', (req, res) => {
+    if (!req.body.email || !req.body.password) {
+        res.status(403).send(`  please send name, email, passwod, phone and gender in json body.
+        e.g:
+        {
+           
+            "email": "kb337137@gmail.com",
+            "password": "****",
+          
+        }`);
+        return;
+    }
+    let email = req.body.email;
+    let password = req.body.password;
+    userModel.findOne({ email: email, password: password }, function (err, data) {
+        if (!err) {
+            res.send({
+                message: "Login",
+                status: 200
+            })
+        }
+        else {
+            console.log(err);
+            return res.status(500).send({
+                message: "User Not Found" + err
+            })
+        }
+    })
+
+});
+
+
+// userModel.find(function (err, data) {
+//     if (err) return console.error(err);
+//     else if (req.body.email === data.email && req.body.password === data.password) {
+//         res.send({
+//             message: "Login",
+//             status: 200
+//         })
+//     }
+//     else {
+//         console.log(err);
+//         res.status(500).send({
+//             message: "user create error, " + err
+//         });
+//     }
+
+
+
+// });
+
+
 
 
 app.listen(PORT, () => {
