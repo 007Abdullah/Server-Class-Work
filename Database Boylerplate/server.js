@@ -79,6 +79,7 @@ app.post("/signup", (req, res, next) => {
         if (!err) {
             res.send({
                 message: "user created",
+                status:200
             });
         }
         else {
