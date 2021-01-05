@@ -1,7 +1,7 @@
 const url = "http://localhost:5000"
 function signup() {
     let user = {
-        name: document.getElementById("txt_name").value,
+        uname: document.getElementById("txt_name").value,
         email: document.getElementById("txt_email").value,
         password: document.getElementById("txt_password").value,
         phone: document.getElementById("txt_number").value,

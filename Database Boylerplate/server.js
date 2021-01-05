@@ -81,9 +81,9 @@ app.post("/signup", (req, res, next) => {
                 message: "user created",
             });
         }
-         else {
-        console.log(err);
-        res.status(500).send("user create error, " + err)
+        else {
+            console.log(err);
+            res.status(500).send("user create error, " + err)
         }
     });
 });
