@@ -112,27 +112,14 @@ app.post('/login', (req, res) => {
 
 });
 
+app.get("/getdata", (req, res, next) => {
+
+    userModel.findOne({email:email}, function (err, data) {
+        res.send(data)
+    });
 
 
-
-// userModel.find(function (err, data) {
-//     if (err) return console.error(err);
-//     else if (req.body.email === data.email && req.body.password === data.password) {
-//         res.send({
-//             message: "Login",
-//             status: 200
-//         })
-//     }
-//     else {
-//         console.log(err);
-//         res.status(500).send({
-//             message: "user create error, " + err
-//         });
-//     }
-
-
-
-// });
+})
 
 
 
