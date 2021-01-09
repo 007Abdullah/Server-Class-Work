@@ -38,6 +38,7 @@ process.on('SIGINT', function () {////this function will run jst before app is c
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
 
 var userSchema = new mongoose.Schema({
+    uid: Number,
     uname: String,
     email: String,
     password: String,
@@ -59,10 +60,11 @@ app.use("/", express.static(path.resolve(path.join(__dirname, "public"))));
 
 
 app.post("/signup", (req, res, next) => {
-    if (!req.body.uname || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
+    if (!req.body.uid || !req.body.uname || !req.body.email || !req.body.password || !req.body.phone || !req.body.gender) {
         res.status(403).send(`  please send name, email, passwod, phone and gender in json body.
         e.g:
         {
+            "uid":"User ID",
             "uname": "Sameer",
             "email": "kb337137@gmail.com",
             "password": "abc",
@@ -76,6 +78,7 @@ app.post("/signup", (req, res, next) => {
             bcrypt.stringToHash(req.body.password).then(ispasswordhash => {
                 console.log("hash: ", ispasswordhash);
                 var newUser = new userModel({
+                    uid: req.body.uid,
                     uname: req.body.uname,
                     email: req.body.email,
                     password: ispasswordhash,
@@ -113,29 +116,75 @@ app.post("/signup", (req, res, next) => {
 
 });
 app.post('/login', (req, res) => {
-
+    if (!req.body.email || !req.body.password) {
+        res.send(
+            ` please send email and passwod in json body.
+                e.g:
+            {
+                "email": "abc@gmail.com",
+                "password": "123",
+            }`
+        )
+    }
     // userModel.findOne({email:req.body.email, password: req.body.password })
-    userModel.findOne({ email: req.body.email, password: req.body.password }, function (err, data) {
+    userModel.findOne({ email: req.body.email }, function (err, data) {
         if (err) {
             console.log(err)
-            res.status(500).send();
+            res.status(500).send({
+                message: "an error occured: " + JSON.stringify(err)
+            });
         }
-        if (!data) {
-            return res.status(404).send({
+        else if (data) {
+            bcrypt.varifyHash(req.body.password, data.password).then(isMatchPassword => {
+                if (isMatchPassword) {
+                    res.send({
+                        message: "login success",
+                        user: {
+                            uid: data.id,
+                            name: data.name,
+                            email: data.email,
+                            phone: data.phone,
+                            gender: data.gender,
+                        },
+                        token: token
+                    });
+
+                } else {
+                    console.log("not matched");
+                    res.status(401).send({
+                        message: "incorrect password"
+                    })
+                }
+            }).catch(e => {
+                console.log("error: ", e)
+            })
+        }
+        else {
+            res.status(403).send({
                 message: "user not found"
             });
         }
-        return res.status(200).send({
-            message: "Login Successfully"
-        })
     })
+    // Querying/reading data from database: https://mongoosejs.com/docs/models.html#querying
+    // deleting data from database: https://mongoosejs.com/docs/models.html#deleting
+    // updating data in database: https://mongoosejs.com/docs/models.html#updating
+
 
 });
 
 app.get("/getdata", (req, res, next) => {
 
-    userModel.findOne({ email: email }, function (err, data) {
-        res.send(data)
+    userModel.find({}, function (err, data) {
+        if (err) {
+            res.send({
+                message: "Err " + JSON.stringify(err)
+            });
+        }
+        else if (data) {
+            res.send({
+                AllData: data
+            })
+        }
     });
 
 
