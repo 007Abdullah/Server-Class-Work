@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
+const bcrypt = require("bcrypt-inzi")
 
 
 
@@ -69,6 +70,9 @@ app.post("/signup", (req, res, next) => {
         }`);
         return;
     }
+    stringToHash(req.body.password).then(string => {
+        console.log("hash: ", string);
+    })
     var newUser = new userModel({
         uname: req.body.uname,
         email: req.body.email,
@@ -114,7 +118,7 @@ app.post('/login', (req, res) => {
 
 app.get("/getdata", (req, res, next) => {
 
-    userModel.findOne({email:email}, function (err, data) {
+    userModel.findOne({ email: email }, function (err, data) {
         res.send(data)
     });
 
