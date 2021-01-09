@@ -5,12 +5,13 @@ const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
-const bcrypt = require("bcrypt-inzi")
+const bcrypt = require("bcrypt-inzi");
+var jwt = require('jsonwebtoken');
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/testdb?retryWrites=true&w=majority";
+let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/CURD_DATA?retryWrites=true&w=majority";
 // let dbURI = 'mongodb://localhost:27017/testdb-database';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
