@@ -173,7 +173,6 @@ app.post('/login', (req, res) => {
 });
 
 app.get("/getdata", (req, res, next) => {
-
     userModel.find({}, function (err, data) {
         if (err) {
             res.send({
@@ -186,10 +185,24 @@ app.get("/getdata", (req, res, next) => {
             })
         }
     });
-
-
 })
 
+app.delete("/delete", (req, res, next) => {
+    userModel.findByIdAndDelete(req.body.uid, function (err, data) {
+        if (err) {
+            res.send({
+                message: "Error " + JSON.stringify(err),
+                status: 404
+            })
+        }
+        else if (data.uid) {
+            res.send({
+                message: "Enter This ID Data Delete",
+                status: 200
+            })
+        }
+    })
+})
 
 
 
