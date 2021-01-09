@@ -70,32 +70,47 @@ app.post("/signup", (req, res, next) => {
         }`);
         return;
     }
-    stringToHash(req.body.password).then(string => {
-        console.log("hash: ", string);
-    })
-    var newUser = new userModel({
-        uname: req.body.uname,
-        email: req.body.email,
-        password: req.body.password,
-        phone: req.body.phone,
-        gender: req.body.gender,
-    });
-    newUser.save((err, data) => {
-        if (!err) {
+    userModel.findOne({ email: req.body.email }, function (err, doc) {
+        if (!err && !doc) {
+            bcrypt.stringToHash(req.body.password).then(ispasswordhash => {
+                console.log("hash: ", ispasswordhash);
+                var newUser = new userModel({
+                    uname: req.body.uname,
+                    email: req.body.email,
+                    password: ispasswordhash,
+                    phone: req.body.phone,
+                    gender: req.body.gender,
+                });
+                newUser.save((err, data) => {
+                    if (!err) {
+                        res.send({
+                            message: "user created",
+                            status: 200
+                        });
+                    }
+                    else {
+                        console.log(err);
+                        res.status(500).send({
+                            message: "user create error, " + err
+                        });
+                    }
+                });
+            });
+        } else if (err) {
             res.send({
-                message: "user created",
-                status: 200
-            });
+                message: "DB ERR" + err,
+                status: 500
+            })
+        } else {
+            res.send({
+                message: "User ALready Exit ",
+                status: 409
+            })
         }
-        else {
-            console.log(err);
-            res.status(500).send({
-                message: "user create error, " + err
-            });
-        }
-    });
-});
 
+    })
+
+});
 app.post('/login', (req, res) => {
 
     // userModel.findOne({email:req.body.email, password: req.body.password })
