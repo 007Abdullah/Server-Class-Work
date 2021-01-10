@@ -186,10 +186,21 @@ app.get("/getdata", (req, res, next) => {
         }
     });
 })
-app.put("/update", (req, res, next) => {
+app.put("/upde", (req, res, next) => {
 
-    userModel.updateOne({ uid: req.body.uid }, { name: req.body.name }, { email: req.body.email }, { password: req.body.password }, { phone: req.body.phone }, { gender: req.body.gender }, function (err, data) {
-        
+    userModel.findByIdAndUpdate({ "uid": req.body.uid }, function (err, data) {
+        if (!err) {
+            res.send({
+                message: "Data Has Been Update",
+                status: 200,
+            })
+        }
+        else if (err) {
+            res.send({
+                message: "Err " + JSON.stringify(err),
+                status: 404
+            })
+        }
     })
 
 
