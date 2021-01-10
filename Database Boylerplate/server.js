@@ -186,7 +186,15 @@ app.get("/getdata", (req, res, next) => {
         }
     });
 })
+app.put("/update", (req, res, next) => {
 
+    userModel.updateOne({ uid: req.body.uid }, { name: req.body.name }, { email: req.body.email }, { password: req.body.password }, { phone: req.body.phone }, { gender: req.body.gender }, function (err, data) {
+        
+    })
+
+
+
+})
 app.delete("/delete", (req, res, next) => {
     userModel.deleteOne({ uid: req.body.uid }, function (err, data) {
         if (!err) {
