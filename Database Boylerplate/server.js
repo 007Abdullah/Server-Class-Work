@@ -188,20 +188,33 @@ app.get("/getdata", (req, res, next) => {
 })
 
 app.delete("/delete", (req, res, next) => {
-    userModel.findByIdAndDelete(req.body.uid, function (err, data) {
-        if (err) {
+    userModel.deleteOne({ uid: req.body.uid }, function (err, data) {
+        if (!err) {
+            res.send({
+                message: "Data Has been Delete",
+                status: 200
+            })
+        } else if (err) {
             res.send({
                 message: "Error " + JSON.stringify(err),
                 status: 404
             })
         }
-        else if (data.uid) {
-            res.send({
-                message: "Enter This ID Data Delete",
-                status: 200
-            })
-        }
-    })
+    });
+    // userModel.findByIdAndDelete(req.body.uid, function (err, data) {
+    //     if (err) {
+    //         res.send({
+    //             message: "Error " + JSON.stringify(err),
+    //             status: 404
+    //         })
+    //     }
+    //     else if (data.uid) {
+    //         res.send({
+    //             message: "Enter This ID Data Delete",
+    //             status: 200
+    //         })
+    //     }
+    // })
 })
 
 
