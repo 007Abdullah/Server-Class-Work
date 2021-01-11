@@ -11,7 +11,8 @@ var jwt = require('jsonwebtoken');// https://github.com/auth0/node-jsonwebtoken
 //is JWT secure? https://stackoverflow.com/questions/27301557/if-you-can-decode-jwt-how-are-they-secure
 
 var SERVER_SECRET = process.env.SECRET || "1234";
-
+var POSTMARK_KEY = "1234";
+var postmark = require("postmark")(POSTMARK_KEY);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/CURD_DATA?retryWrites=true&w=majority";
@@ -252,7 +253,22 @@ app.get("/profile", (req, res, next) => {
     });
 
 });
-
+app.post("/send", (req, res, next) => {
+    res.send({
+        email: postmark.send({
+            "From": req.body.from,
+            "To": req.body.to,
+            "Subject": req.body.subject,
+            "TextBody": req.body.emailBody
+        }, function (err, to) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log("Email sent to: %s", to);
+        })
+    })
+})
 app.post("/logout", (req, res, next) => {
     res.cookie("jToken", "", {
         maxAge: 86_400_000,
@@ -260,7 +276,6 @@ app.post("/logout", (req, res, next) => {
     });
     res.send("logout success");
 })
-
 
 
 
