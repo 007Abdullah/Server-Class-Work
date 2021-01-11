@@ -11,8 +11,8 @@ var jwt = require('jsonwebtoken');// https://github.com/auth0/node-jsonwebtoken
 //is JWT secure? https://stackoverflow.com/questions/27301557/if-you-can-decode-jwt-how-are-they-secure
 
 var SERVER_SECRET = process.env.SECRET || "1234";
-var POSTMARK_KEY = "1234";
-var postmark = require("postmark")(POSTMARK_KEY);
+
+var postmark = require("postmark");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/CURD_DATA?retryWrites=true&w=majority";
@@ -254,8 +254,9 @@ app.get("/profile", (req, res, next) => {
 
 });
 app.post("/send", (req, res, next) => {
+    var client = new postmark.Client(req.cookie.jToken);
     res.send({
-        email: postmark.send({
+        email: client.sendEmail({
             "From": req.body.from,
             "To": req.body.to,
             "Subject": req.body.subject,
