@@ -6,8 +6,11 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 const bcrypt = require("bcrypt-inzi");
-var jwt = require('jsonwebtoken');
+const cookieParser = require("cookie-parser");
+var jwt = require('jsonwebtoken');// https://github.com/auth0/node-jsonwebtoken
+//is JWT secure? https://stackoverflow.com/questions/27301557/if-you-can-decode-jwt-how-are-they-secure
 
+var SERVER_SECRET = process.env.SECRET || "1234";
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,6 +19,8 @@ let dbURI = "mongodb+srv://root:root@cluster0.s5oku.mongodb.net/CURD_DATA?retryW
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+//https://mongoosejs.com/docs/connections.html#connection-events
+
 mongoose.connection.on('connected', function () {//connected
     console.log('Mongoose is connected');
 });
@@ -36,6 +41,7 @@ process.on('SIGINT', function () {////this function will run jst before app is c
     });
 });
 ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+// https://mongoosejs.com/docs/schematypes.html#what-is-a-schematype
 
 var userSchema = new mongoose.Schema({
     uid: Number,
@@ -46,13 +52,18 @@ var userSchema = new mongoose.Schema({
     gender: String,
     createdon: { type: Date, 'default': Date.now }
 });
+// https://mongoosejs.com/docs/models.html
 
 var userModel = mongoose.model("users", userSchema);
 
 var app = express();
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+    origin: "*",
+    credentials: true
+}));
 app.use(morgan('dev'));
 
 app.use("/", express.static(path.resolve(path.join(__dirname, "public"))));
@@ -137,6 +148,23 @@ app.post('/login', (req, res) => {
         else if (data) {
             bcrypt.varifyHash(req.body.password, data.password).then(isMatchPassword => {
                 if (isMatchPassword) {
+
+                    let token = jwt.sign({
+                        id: data._id,
+                        name: data.name,
+                        email: data.email
+
+                    }, SERVER_SECRET)
+
+                    res.cookie("jToken", token, {
+                        maxAge: 86_400_000,
+                        httpOnly: true
+                    });
+                    //when making request from frontend:
+                    // var xhr = new XMLHttpRequest();
+                    // xhr.open('GET', 'http://example.com/', true);
+                    // xhr.withCredentials = true;
+                    // xhr.send(null);
                     res.send({
                         message: "login success",
                         user: {
@@ -146,7 +174,7 @@ app.post('/login', (req, res) => {
                             phone: data.phone,
                             gender: data.gender,
                         },
-                        token: token
+
                     });
 
                 } else {
@@ -171,6 +199,16 @@ app.post('/login', (req, res) => {
 
 
 });
+
+app.use(function (req, res, next) {
+    console.log("req.cookie", req.cookies);
+    if(!req.cookies.jToken){
+
+    }
+});
+
+
+
 
 app.get("/getdata", (req, res, next) => {
     userModel.find({}, function (err, data) {
