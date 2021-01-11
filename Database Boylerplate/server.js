@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const path = require("path");
 const bcrypt = require("bcrypt-inzi");
-const cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser");//www.npmjs.com/package/cookie-parser
 var jwt = require('jsonwebtoken');// https://github.com/auth0/node-jsonwebtoken
 //is JWT secure? https://stackoverflow.com/questions/27301557/if-you-can-decode-jwt-how-are-they-secure
 
@@ -202,77 +202,132 @@ app.post('/login', (req, res) => {
 
 app.use(function (req, res, next) {
     console.log("req.cookie", req.cookies);
-    if(!req.cookies.jToken){
-
+    if (!req.cookies.jToken) {
+        res.status(401).send("include http-only credentials with every request");
+        return;
     }
+    jwt.verify(req.cookies.jToken, SERVER_SECRET, function (err, decodedData) {
+        if (!err) {
+            const issueDate = decodedData.iat * 1000;
+            const nowDate = new Date().getTime();
+            const diff = nowDate - issueDate; //86400,000
+
+            if (diff > 300000) {// expire after 5 min (in milis)
+                res.status(401).send("token expired");
+            } else {//issue new token
+                var token = jwt.sign({
+                    id: decodedData.id,
+                    name: decodedData.name,
+                    email: decodedData.email,
+                }, SERVER_SECRET)
+                res.cookie('jToken', token, {
+                    maxAge: 86_400_000,
+                    httpOnly: true
+                });
+                req.body.jToken = decodedData // this line disscuse how it work
+                next();
+            }
+
+        } else {
+            res.status(401).send("invalid token");
+        }
+    });
 });
 
+app.get("/profile", (req, res, next) => {
+    console.log(req.body);
 
-
-
-app.get("/getdata", (req, res, next) => {
-    userModel.find({}, function (err, data) {
-        if (err) {
+    userModel.findById(req.body.jToken.id, 'name email phone gender createdOn', function (err, doc) {
+        if (!err) {
             res.send({
-                message: "Err " + JSON.stringify(err)
+                profile: doc,
+                status: 200
+            });
+        } else {
+            res.send({
+                message: 'Server Error',
+                status: 500
             });
         }
-        else if (data) {
-            res.send({
-                AllData: data
-            })
-        }
     });
-})
-app.put("/upde", (req, res, next) => {
 
-    userModel.findByIdAndUpdate({ "uid": req.body.uid }, function (err, data) {
-        if (!err) {
-            res.send({
-                message: "Data Has Been Update",
-                status: 200,
-            })
-        }
-        else if (err) {
-            res.send({
-                message: "Err " + JSON.stringify(err),
-                status: 404
-            })
-        }
-    })
+});
 
-
-
-})
-app.delete("/delete", (req, res, next) => {
-    userModel.deleteOne({ uid: req.body.uid }, function (err, data) {
-        if (!err) {
-            res.send({
-                message: "Data Has been Delete",
-                status: 200
-            })
-        } else if (err) {
-            res.send({
-                message: "Error " + JSON.stringify(err),
-                status: 404
-            })
-        }
+app.post("/logout", (req, res, next) => {
+    res.cookie("jToken", "", {
+        maxAge: 86_400_000,
+        httpOnly: true
     });
-    // userModel.findByIdAndDelete(req.body.uid, function (err, data) {
-    //     if (err) {
-    //         res.send({
-    //             message: "Error " + JSON.stringify(err),
-    //             status: 404
-    //         })
-    //     }
-    //     else if (data.uid) {
-    //         res.send({
-    //             message: "Enter This ID Data Delete",
-    //             status: 200
-    //         })
-    //     }
-    // })
+    res.send("logout success");
 })
+
+
+
+
+
+// app.get("/getdata", (req, res, next) => {
+//     userModel.find({}, function (err, data) {
+//         if (err) {
+//             res.send({
+//                 message: "Err " + JSON.stringify(err)
+//             });
+//         }
+//         else if (data) {
+//             res.send({
+//                 AllData: data
+//             })
+//         }
+//     });
+// })
+// app.put("/upde", (req, res, next) => {
+
+//     userModel.findByIdAndUpdate({ "uid": req.body.uid }, function (err, data) {
+//         if (!err) {
+//             res.send({
+//                 message: "Data Has Been Update",
+//                 status: 200,
+//             })
+//         }
+//         else if (err) {
+//             res.send({
+//                 message: "Err " + JSON.stringify(err),
+//                 status: 404
+//             })
+//         }
+//     })
+
+
+
+// })
+// app.delete("/delete", (req, res, next) => {
+//     userModel.deleteOne({ uid: req.body.uid }, function (err, data) {
+//         if (!err) {
+//             res.send({
+//                 message: "Data Has been Delete",
+//                 status: 200
+//             })
+//         } else if (err) {
+//             res.send({
+//                 message: "Error " + JSON.stringify(err),
+//                 status: 404
+//             })
+//         }
+//     });
+//     // userModel.findByIdAndDelete(req.body.uid, function (err, data) {
+//     //     if (err) {
+//     //         res.send({
+//     //             message: "Error " + JSON.stringify(err),
+//     //             status: 404
+//     //         })
+//     //     }
+//     //     else if (data.uid) {
+//     //         res.send({
+//     //             message: "Enter This ID Data Delete",
+//     //             status: 200
+//     //         })
+//     //     }
+//     // })
+// })
 
 
 
