@@ -151,7 +151,7 @@ app.post('/login', (req, res) => {
 
                     let token = jwt.sign({
                         id: data._id,
-                        name: data.name,
+                        name: data.uname,
                         email: data.email
 
                     }, SERVER_SECRET)
@@ -169,7 +169,7 @@ app.post('/login', (req, res) => {
                         message: "login success",
                         user: {
                             uid: data.id,
-                            name: data.name,
+                            name: data.uname,
                             email: data.email,
                             phone: data.phone,
                             gender: data.gender,
@@ -217,7 +217,7 @@ app.use(function (req, res, next) {
             } else {//issue new token
                 var token = jwt.sign({
                     id: decodedData.id,
-                    name: decodedData.name,
+                    name: decodedData.uname,
                     email: decodedData.email,
                 }, SERVER_SECRET)
                 res.cookie('jToken', token, {
@@ -237,7 +237,7 @@ app.use(function (req, res, next) {
 app.get("/profile", (req, res, next) => {
     console.log(req.body);
 
-    userModel.findById(req.body.jToken.id, 'name email phone gender createdOn', function (err, doc) {
+    userModel.findById(req.body.jToken.id, 'uname email phone gender createdOn', function (err, doc) {
         if (!err) {
             res.send({
                 profile: doc,
